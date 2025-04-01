@@ -4,7 +4,7 @@ using namespace std;
 
 int main()
 {
-
+// changed by krishna
     cout << "\n=============================================================" << endl;
     cout << "||\t\t      !!( Welcome )!!                      ||" << endl;
     cout << "||\t\t Pharmacy Management System                ||" << endl;
