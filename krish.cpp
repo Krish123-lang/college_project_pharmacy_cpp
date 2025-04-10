@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
-// #include <conio.h>
+#include <fstream>
+#include <sstream>
 using namespace std;
 
 int i = 0;
@@ -17,8 +18,66 @@ void clearConsole()
     #ifdef _WIN32
         std::system("cls");
     #else
-        std::cout << "\033[2J\033[1;1H"; // ANSI escape codes for clearing the screen
+        std::system("clear");
     #endif
+}
+
+void Load_Data()
+{
+    ifstream file("medicine_data.csv");
+    if (file.is_open())
+    {
+        i = 0; // Reset the index
+        string line;
+        getline(file, line); // Skip the header line
+
+        while (getline(file, line))
+        {
+            stringstream ss(line);
+            string token;
+
+            getline(ss, s[i].Name, ',');
+            getline(ss, token, ',');
+            s[i].Quantity = stoi(token);
+            getline(ss, token, ',');
+            s[i].Price = stof(token);
+            getline(ss, token, '/');
+            s[i].Year = stoi(token);
+            getline(ss, token, '/');
+            s[i].Month = stoi(token);
+            getline(ss, token, ',');
+            s[i].Day = stoi(token);
+
+            i++;
+        }
+        file.close();
+    }
+    else
+    {
+        cout << "Error: Unable to open file for reading.\n";
+    }
+}
+
+void Save_Data()
+{
+    ofstream file("medicine_data.csv");
+    if (file.is_open())
+    {
+        // Write the header
+        file << "Name,Quantity,Price,Expiry Date\n";
+
+        // Write the medicine data
+        for (int a = 0; a < i; a++)
+        {
+            file << s[a].Name << "," << s[a].Quantity << "," << s[a].Price << ","
+                 << s[a].Year << "/" << s[a].Month << "/" << s[a].Day << "\n";
+        }
+        file.close();
+    }
+    else
+    {
+        cout << "Error: Unable to open file for writing.\n";
+    }
 }
 
 class Authentication_Management
@@ -86,6 +145,31 @@ public:
         cout << " Enter Day   = ";
         cin >> s[i].Day;
 
+        // Check if the file exists
+        ifstream checkFile("medicine_data.csv");
+        bool fileExists = checkFile.good();
+        checkFile.close();
+
+        // Write the data to a CSV file
+        ofstream file("medicine_data.csv", ios::app); // Open in append mode
+        if (file.is_open())
+        {
+            // Add column headers if the file is being created for the first time
+            if (!fileExists)
+            {
+                file << "Name,Quantity,Price,Expiry Date\n";
+            }
+
+            // Write the medicine data
+            file << s[i].Name << "," << s[i].Quantity << "," << s[i].Price << ","
+                << s[i].Year << "/" << s[i].Month << "/" << s[i].Day << "\n";
+            file.close();
+        }
+        else
+        {
+            cout << "Error: Unable to open file for writing.\n";
+        }
+
         // cin.ignore(); // Clear the input buffer
 
         cout << "_____________________________________________________________" << endl;
@@ -100,6 +184,8 @@ public:
 
     void Update_Medicine()
     {
+        Load_Data(); // Load data from the CSV file
+
         clearConsole();
 
         cout << "\n=============================================================" << endl;
@@ -108,7 +194,7 @@ public:
 
         if (i == 0)
         {
-            cout << "\n\t\t No Record Found...!! "<<endl;
+            cout << "\n\t\t No Record Found...!! " << endl;
             cout << "_____________________________________________________________" << endl;
 
             cout << "\nPress Enter to return to the Main Menu... ";
@@ -122,7 +208,6 @@ public:
         bool Found = false;
 
         cout << " Enter Medicine Name = ";
-        // cin >> Name;
         cin.ignore();
         getline(cin, Name);
 
@@ -137,7 +222,6 @@ public:
                 cout << " New Price = ";
                 cin >> s[a].Price;
 
-
                 cout << " Enter New Expiry Date ( Year/Month/Day )" << endl;
                 cout << " Enter New Year  = ";
                 cin >> s[a].Year;
@@ -146,35 +230,36 @@ public:
                 cout << " Enter New Day   = ";
                 cin >> s[a].Day;
 
-                cin.ignore();
-
-                cout << "_____________________________________________________________" << endl;
-                cout << "\n\t\t Updated Successfully...!!" << endl;
-                cout << "_____________________________________________________________" << endl;
                 Found = true;
-
-                // cout << "\nPress Enter to return to the Main Menu... ";
-                // cin.ignore();
-                // cin.get();
-
                 break;
             }
         }
-        
-        if (!Found)
+
+        if (Found)
         {
-            cout << "_____________________________________________________________" <<endl<< endl;
+            Save_Data(); // Save the updated data back to the CSV file
+
+            cout << "_____________________________________________________________" << endl;
+            cout << "\n\t\t Updated Successfully...!!" << endl;
+            cout << "_____________________________________________________________" << endl;
+        }
+        else
+        {
+            cout << "_____________________________________________________________" << endl
+                 << endl;
             cout << " \t\tMedicine Name not found...!!" << endl;
             cout << "_____________________________________________________________" << endl;
         }
 
         cout << "\nPress Enter to return to the Inventory Management Menu... ";
-        // cin.ignore();
+        cin.ignore();
         cin.get();
     }
 
     void Search_Medicine()
     {
+        Load_Data(); // Load data from the CSV file
+
         clearConsole();
 
         cout << "\n=============================================================" << endl;
@@ -183,7 +268,7 @@ public:
 
         if (i == 0)
         {
-            cout << "\n\t\t No Record Found...!! "<<endl;
+            cout << "\n\t\t No Record Found...!! " << endl;
             cout << "_____________________________________________________________" << endl;
 
             cout << "\nPress Enter to return to the Main Menu... ";
@@ -192,13 +277,11 @@ public:
 
             return;
         }
-        
+
         string Name;
         bool Found = false;
 
         cout << " Enter Medicine Name = ";
-        // cin >> Name;
-
         cin.ignore();
         getline(cin, Name);
 
@@ -211,20 +294,16 @@ public:
                 cout << " Quantity                       = " << s[a].Quantity << endl;
                 cout << " Price                          = " << s[a].Price << endl;
                 cout << " Expiry Date ( Year/Month/Day ) = " << s[a].Year << "/" << s[a].Month << "/" << s[a].Day << endl;
-                
-                Found = true;
 
-                // cout << "\nPress Enter to return to the Main Menu... ";
-                // cin.ignore();
-                // cin.get();
-                
+                Found = true;
                 break;
             }
         }
-        
+
         if (!Found)
         {
-            cout << "_____________________________________________________________"<<endl << endl;
+            cout << "_____________________________________________________________" << endl
+                 << endl;
             cout << " \t\tMedicine Name not found...!!" << endl;
             cout << "_____________________________________________________________" << endl;
         }
@@ -236,6 +315,8 @@ public:
 
     void Delete_Medicine()
     {
+        Load_Data(); // Load data from the CSV file
+
         clearConsole();
 
         cout << "\n=============================================================" << endl;
@@ -244,7 +325,7 @@ public:
 
         if (i == 0)
         {
-            cout << "\n\t\t No Record Found...!! "<<endl;
+            cout << "\n\t\t No Record Found...!! " << endl;
             cout << "_____________________________________________________________" << endl;
 
             cout << "\nPress Enter to return to the Main Menu... ";
@@ -258,8 +339,6 @@ public:
         bool Found = false;
 
         cout << " Enter Medicine Name = ";
-        // cin >> Name;
-
         cin.ignore();
         getline(cin, Name);
 
@@ -272,21 +351,23 @@ public:
                     s[j] = s[j + 1];
                 }
                 i--;
-                cout << "_____________________________________________________________" << endl;
-                cout << "\n\t\t Deleted Successfully...!!" << endl;
-                cout << "_____________________________________________________________" << endl;
                 Found = true;
                 break;
-
-                // cout << "\nPress Enter to return to the Main Menu... ";
-                // cin.ignore();
-                // cin.get();
             }
         }
-        
-        if (!Found)
+
+        if (Found)
         {
-            cout << "_____________________________________________________________" << endl<<endl;
+            Save_Data(); // Save the updated data back to the CSV file
+
+            cout << "_____________________________________________________________" << endl;
+            cout << "\n\t\t Deleted Successfully...!!" << endl;
+            cout << "_____________________________________________________________" << endl;
+        }
+        else
+        {
+            cout << "_____________________________________________________________" << endl
+                 << endl;
             cout << " \t\tMedicine Name not found...!!" << endl;
             cout << "_____________________________________________________________" << endl;
         }
@@ -298,31 +379,32 @@ public:
     
     void View_Medicine()
     {
+        Load_Data(); // Load data from the CSV file
+
         clearConsole();
 
         cout << "\n=============================================================" << endl;
         cout << "||\t\t      View All Medicine                    ||" << endl;
         cout << "=============================================================" << endl;
-        
+
         if (i == 0)
         {
-            cout << "\n\t\t No Record Found...!! "<<endl;
+            cout << "\n\t\t No Record Found...!! " << endl;
             cout << "_____________________________________________________________" << endl;
 
-            
             cout << "\nPress Enter to return to the Main Menu... ";
             cin.ignore();
             cin.get();
 
             return;
         }
-        
+
         for (int a = 0; a < i; a++)
         {
             cout << "\nMedicine " << a + 1 << ":" << endl;
             cout << " Name                           = " << s[a].Name << endl;
-            cout << " Price                          = " << s[a].Price << endl;
             cout << " Quantity                       = " << s[a].Quantity << endl;
+            cout << " Price                          = " << s[a].Price << endl;
             cout << " Expiry Date ( Year/Month/Day ) = " << s[a].Year << "/" << s[a].Month << "/" << s[a].Day << endl;
             cout << "_____________________________________________________________" << endl;
         }
@@ -464,6 +546,8 @@ int main()
     Reports_Analysis r1;
     Data_Storage_Security d1;
 
+    Load_Data();
+
     int Option1;
 
     while (true)
@@ -502,6 +586,7 @@ int main()
             break;
         case 5:
             cout << "\n Exiting Program...!!\n";
+            Save_Data();
             return 0;
         default:
             cout << "\n Invalid Option...!!\n";
