@@ -2,7 +2,6 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-#include <vector>
 using namespace std;
 
 int i = 0;
@@ -477,13 +476,14 @@ class Sales_Billing
 private:
     struct BillItem
     {
-        string Name;
+        string Name, CustomerName;
         int Quantity;
         float Price;
         float TotalPrice;
     };
 
-    vector<BillItem> billItems; // Temporary storage for items in the bill
+    BillItem billItems[100]; // Fixed-size array for storing bill items
+    int billItemCount = 0;   // Counter to track the number of items in the bill
     float totalAmount = 0.0;
 
 public:
@@ -535,18 +535,17 @@ public:
                 }
 
                 // Add item to the bill
-                BillItem newItem;
-                newItem.Name = s[a].Name;
-                newItem.Quantity = quantity;
-                newItem.Price = s[a].Price;
-                newItem.TotalPrice = quantity * s[a].Price;
-                billItems.push_back(newItem);
+                billItems[billItemCount].Name = s[a].Name;
+                billItems[billItemCount].Quantity = quantity;
+                billItems[billItemCount].Price = s[a].Price;
+                billItems[billItemCount].TotalPrice = quantity * s[a].Price;
+                billItemCount++;
 
                 // Update inventory
                 s[a].Quantity -= quantity;
 
                 // Update total amount
-                totalAmount += newItem.TotalPrice;
+                totalAmount += billItems[billItemCount - 1].TotalPrice;
 
                 cout << "\n Item added to the bill successfully!" << endl;
                 cin.get();
@@ -574,7 +573,7 @@ public:
         cout << "||\t\t     Sales Bill                          ||" << endl;
         cout << "=============================================================" << endl;
 
-        if (billItems.empty())
+        if (billItemCount == 0)
         {
             cout << "\n\t\t No items in the bill...!! " << endl;
             cout << "_____________________________________________________________" << endl;
@@ -588,9 +587,9 @@ public:
         cout << " Item Name\tQuantity\tPrice\tTotal Price" << endl;
         cout << "-------------------------------------------------------------" << endl;
 
-        for (const auto &item : billItems)
+        for (int a = 0; a < billItemCount; a++)
         {
-            cout << " " << item.Name << "\t\t" << item.Quantity << "\t\t" << item.Price << "\t" << item.TotalPrice << endl;
+            cout << " " << billItems[a].Name << "\t\t" << billItems[a].Quantity << "\t\t" << billItems[a].Price << "\t" << billItems[a].TotalPrice << endl;
         }
 
         cout << "-------------------------------------------------------------" << endl;
@@ -606,10 +605,10 @@ public:
         clearConsole();
 
         cout << "\n=============================================================" << endl;
-        cout << "||\t\t     Save Bill to File                    ||" << endl;
+        cout << "||\t\t     Save Bill to CSV File                ||" << endl;
         cout << "=============================================================" << endl;
 
-        if (billItems.empty())
+        if (billItemCount == 0)
         {
             cout << "\n\t\t No items in the bill to save...!! " << endl;
             cout << "_____________________________________________________________" << endl;
@@ -631,9 +630,9 @@ public:
             }
 
             // Write the bill items
-            for (const auto &item : billItems)
+            for (int a = 0; a < billItemCount; a++)
             {
-                file << item.Name << "," << item.Quantity << "," << item.Price << "," << item.TotalPrice << "\n";
+                file << billItems[a].Name << "," << billItems[a].Quantity << "," << billItems[a].Price << "," << billItems[a].TotalPrice << "\n";
             }
 
             // Write the total amount
@@ -708,21 +707,6 @@ public:
     }
 };
 
-class Data_Storage_Security
-{
-public:
-    void Data_Storage_Security_Print()
-    {
-        cout << "\n=============================================================" << endl;
-        cout << "||\t     DATA STORAGE AND SECURITY MANAGEMENT          ||" << endl;
-        cout << "=============================================================" << endl;
-
-        cout << "\nPress Enter to return to the Main Menu... ";
-        cin.ignore();
-        cin.get();
-    }
-};
-
 int main()
 {
     Authentication_Management A1;
@@ -751,7 +735,6 @@ int main()
     Inventory n1;
     Sales_Billing s1;
     Reports_Analysis r1;
-    Data_Storage_Security d1;
 
     Load_Data();
 
@@ -771,8 +754,7 @@ int main()
         cout << " 1> Inventory Management" << endl;
         cout << " 2> Sales and Billing Management" << endl;
         cout << " 3> Reports and Analytics Management" << endl;
-        cout << " 4> Data Storage and Security" << endl;
-        cout << " 5> Exit Program" << endl;
+        cout << " 4> Exit Program" << endl;
         cout << "_____________________________________________________________" << endl;
         cout << " Enter your Option = ";
         cin >> Option1;
@@ -789,9 +771,6 @@ int main()
             r1.Reports_Analysis_Print();
             break;
         case 4:
-            d1.Data_Storage_Security_Print();
-            break;
-        case 5:
             cout << "\n Exiting Program...!!\n";
             Save_Data();
             return 0;
