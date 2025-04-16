@@ -27,9 +27,9 @@ void Load_Data()
     ifstream file("medicine_data.csv");
     if (file.is_open())
     {
-        i = 0; // Reset the index
+        i = 0; 
         string line;
-        getline(file, line); // Skip the header line
+        getline(file, line);
 
         while (getline(file, line))
         {
@@ -63,10 +63,8 @@ void Save_Data()
     ofstream file("medicine_data.csv");
     if (file.is_open())
     {
-        // Write the header
         file << "Name,Quantity,Price,Expiry Date\n";
 
-        // Write the medicine data
         for (int a = 0; a < i; a++)
         {
             file << s[a].Name << "," << s[a].Quantity << "," << s[a].Price << ","
@@ -103,7 +101,6 @@ public:
         {
 
             clearConsole();
-
             return true;
         }
         else
@@ -119,68 +116,6 @@ class Inventory
 {
 public:
     int Option2;
-
-    // void Insert_Medicine()
-    // {
-    //     clearConsole();
-
-    //     cout << "\n=============================================================" << endl;
-    //     cout << "||\t\t     Insert Medicine                       ||" << endl;
-    //     cout << "=============================================================" << endl;
-
-    //     cout << " Enter Medicine Name = ";
-    //     cin >> s[i].Name;
-        
-    //     cout << " Enter Quantity = ";
-    //     cin >> s[i].Quantity;
-
-    //     cout << " Enter Price = ";
-    //     cin >> s[i].Price;
-
-    //     cout << " Enter Expiry Date ( Year/Month/Day )" << endl;
-    //     cout << " Enter Year  = ";
-    //     cin >> s[i].Year;
-    //     cout << " Enter Month = ";
-    //     cin >> s[i].Month;
-    //     cout << " Enter Day   = ";
-    //     cin >> s[i].Day;
-
-    //     // Check if the file exists
-    //     ifstream checkFile("medicine_data.csv");
-    //     bool fileExists = checkFile.good();
-    //     checkFile.close();
-
-    //     // Write the data to a CSV file
-    //     ofstream file("medicine_data.csv", ios::app); // Open in append mode
-    //     if (file.is_open())
-    //     {
-    //         // Add column headers if the file is being created for the first time
-    //         if (!fileExists)
-    //         {
-    //             file << "Name,Quantity,Price,Expiry Date\n";
-    //         }
-
-    //         // Write the medicine data
-    //         file << s[i].Name << "," << s[i].Quantity << "," << s[i].Price << ","
-    //             << s[i].Year << "/" << s[i].Month << "/" << s[i].Day << "\n";
-    //         file.close();
-    //     }
-    //     else
-    //     {
-    //         cout << "Error: Unable to open file for writing.\n";
-    //     }
-
-    //     // cin.ignore(); // Clear the input buffer
-
-    //     cout << "_____________________________________________________________" << endl;
-    //     cout << "\n\t\t Inserted Successfully...!!" << endl;
-    //     cout << "_____________________________________________________________" << endl;
-    //     i++;
-
-    //     cout << "\nPress Enter to return to the Main Menu... ";
-    //     cin.ignore();
-    //     cin.get();
-    // }
 
     void Insert_Medicine()
     {
@@ -213,7 +148,6 @@ public:
         cout << " Enter Day   = ";
         cin >> day;
 
-        // Check if the medicine already exists
         bool found = false;
         for (int a = 0; a < i; a++)
         {
@@ -263,7 +197,7 @@ public:
 
     void Update_Medicine()
     {
-        Load_Data(); // Load data from the CSV file
+        Load_Data(); 
 
         clearConsole();
 
@@ -316,7 +250,7 @@ public:
 
         if (Found)
         {
-            Save_Data(); // Save the updated data back to the CSV file
+            Save_Data();
 
             cout << "_____________________________________________________________" << endl;
             cout << "\n\t\t Updated Successfully...!!" << endl;
@@ -337,7 +271,7 @@ public:
 
     void Search_Medicine()
     {
-        Load_Data(); // Load data from the CSV file
+        Load_Data(); 
 
         clearConsole();
 
@@ -388,13 +322,12 @@ public:
         }
 
         cout << "\nPress Enter to return to the Inventory Management Menu... ";
-        // cin.ignore();
         cin.get();
     }
 
     void Delete_Medicine()
     {
-        Load_Data(); // Load data from the CSV file
+        Load_Data(); 
 
         clearConsole();
 
@@ -437,7 +370,7 @@ public:
 
         if (Found)
         {
-            Save_Data(); // Save the updated data back to the CSV file
+            Save_Data();
 
             cout << "_____________________________________________________________" << endl;
             cout << "\n\t\t Deleted Successfully...!!" << endl;
@@ -452,14 +385,12 @@ public:
         }
 
         cout << "\nPress Enter to return to the Inventory Management Menu... ";
-        // cin.ignore();
         cin.get();
     }
     
     void View_Medicine()
     {
-        Load_Data(); // Load data from the CSV file
-
+        Load_Data(); 
         clearConsole();
 
         cout << "\n=============================================================" << endl;
@@ -545,7 +476,6 @@ public:
             }
 
             cout << "\nPress any key to go back to the Inventory Management Menu...!! ";
-            // getch();
         }
     }
 };
@@ -663,7 +593,6 @@ public:
         Save_Data(); 
 
         cout << "\nPress Enter to return to the Sales and Billing Menu... ";
-        // cin.ignore();
         cin.get();
     }
 
@@ -686,14 +615,6 @@ public:
             return;
         }
 
-        // cout << " Item Name\tQuantity\tPrice\tTotal Price" << endl;
-        // cout << "-------------------------------------------------------------" << endl;
-
-        // for (int a = 0; a < billItemCount; a++)
-        // {
-        //     cout << " " << billItems[a].Name << "\t\t" << billItems[a].Quantity << "\t\t" << billItems[a].Price << "\t" << billItems[a].TotalPrice << endl;
-        // }
-
         for (int a = 0; a < billItemCount; a++)
         {
             cout<< " Item Name: " << billItems[a].Name <<endl;
@@ -703,7 +624,6 @@ public:
             cout << "-------------------------------------------------------------" << endl;
         }
 
-        // cout << "-------------------------------------------------------------" << endl;
         cout << " Total Amount: " << totalAmount << endl;
 
         cout << "\nPress Enter to return to the Sales and Billing Menu... ";
@@ -730,23 +650,20 @@ public:
             return;
         }
 
-        // Open the CSV file in append mode
+        // Open the CSV file
         ofstream file("sales_bills.csv", ios::app);
         if (file.is_open())
         {
-            // Write the header if the file is empty
             if (file.tellp() == 0) 
             {
                 file << "Item Name,Quantity,Price,Total Price\n";
             }
 
-            // Write the bill items
             for (int a = 0; a < billItemCount; a++)
             {
                 file << billItems[a].Name << "," << billItems[a].Quantity << "," << billItems[a].Price << "," << billItems[a].TotalPrice << "\n";
             }
 
-            // Write the total amount
             file << "Total Amount,,," << totalAmount << "\n";
             file << ",,,," << "\n";
 
@@ -807,19 +724,6 @@ public:
 class Reports_Analysis
 {
 public:
-    // void Reports_Analysis_Print()
-    // {
-    //     cout << "\n=============================================================" << endl;
-    //     cout << "||\t      REPORT AND ANALYSIS MANAGEMENT               ||" << endl;
-    //     cout << "=============================================================" << endl;
-
-    //     cout << "\nPress Enter to return to the Main Menu... ";
-    //     cin.ignore();
-    //     cin.get();
-    // }
-
-    // =======================================================
-
     void Reports_Analysis_Menu()
     {
         int option;
@@ -1002,26 +906,12 @@ public:
             stringstream ss(line);
             string token;
 
-            // getline(ss, token, ','); // Item Name
-            // getline(ss, token, ','); // Quantity
-            // getline(ss, token, ','); // Price
-            // getline(ss, token, ','); // Total Price
-
-            // if (token == "Total Amount")
-            // {
-            //     getline(ss, token, ',');
-            //     totalRevenue += stof(token);
-            // }
-
-
-            // Check if the line starts with "Total Amount"
             getline(ss, token, ',');
             if (token == "Total Amount")
             {
-                // Skip the next two columns and extract the total amount
-                getline(ss, token, ','); // Skip empty column
-                getline(ss, token, ','); // Skip empty column
-                getline(ss, token, ','); // Extract the total amount
+                getline(ss, token, ',');
+                getline(ss, token, ',');
+                getline(ss, token, ','); 
                 totalRevenue += stof(token);
             }
         }
@@ -1032,23 +922,6 @@ public:
         cout << "_____________________________________________________________" << endl;
     }
 
-    // void Generate_Summary_Report()
-    // {
-    //     clearConsole();
-
-    //     cout << "\n=============================================================" << endl;
-    //     cout << "||\t      Summary Report                                ||" << endl;
-    //     cout << "=============================================================" << endl;
-
-    //     View_Low_Stock();
-    //     View_Expired_Medicines();
-    //     View_Total_Sales();
-
-    //     cout << "\n Summary Report Generated Successfully!" << endl;
-    //     cout << "_____________________________________________________________" << endl;
-    // }
-
-
     void Generate_Summary_Report()
     {
         clearConsole();
@@ -1057,7 +930,6 @@ public:
         cout << "||\t      Summary Report                                ||" << endl;
         cout << "=============================================================" << endl;
 
-        // Open the CSV file to save the summary report
         ofstream file("summary_report.csv");
         if (!file.is_open())
         {
@@ -1065,9 +937,7 @@ public:
             return;
         }
 
-        // Write the header to the CSV file
         file << "Summary Report\n";
-        // file << "=============================================================\n";
 
         // View Low-Stock Medicines
         file << "\nLow-Stock Medicines:\n";
@@ -1076,8 +946,7 @@ public:
         cout << " Name\t\tQuantity\n";
         cout << "-----------------------------------\n";
 
-        Load_Data(); // Load inventory data
-        // int threshold = 5; // Example threshold for low stock
+        Load_Data();
 
         int threshold;
         cout << " Enter the low-stock threshold: ";
@@ -1108,8 +977,6 @@ public:
         cout << " Name\t\tExpiry Date\n";
         cout << "-----------------------------------\n";
 
-        // int currentYear = 2025, currentMonth = 4, currentDay = 16; // Example current date
-
         int currentYear, currentMonth, currentDay;
         cout << " Enter today's date (Year Month Day): ";
         cin >> currentYear >> currentMonth >> currentDay;
@@ -1135,7 +1002,6 @@ public:
         }
 
         // View Total Sales and Revenue
-        // file << "\nTotal Sales and Revenue:\n";
         file << "Total Revenue\n";
         cout << "\nTotal Sales and Revenue:\n";
 
@@ -1153,9 +1019,9 @@ public:
                 getline(ss, token, ',');
                 if (token == "Total Amount")
                 {
-                    getline(ss, token, ','); // Skip empty column
-                    getline(ss, token, ','); // Skip empty column
-                    getline(ss, token, ','); // Extract the total amount
+                    getline(ss, token, ',');
+                    getline(ss, token, ',');
+                    getline(ss, token, ',');
                     totalRevenue += stof(token);
                 }
             }
@@ -1163,18 +1029,12 @@ public:
         }
 
         cout << "Total Revenue: " << totalRevenue << endl;
-        // file << totalRevenue << "\n";
         file << totalRevenue;
 
-        // Close the CSV file
         file.close();
 
         cout << "\n Summary Report Generated Successfully!" << endl;
         cout << "_____________________________________________________________" << endl;
-
-        // Pause to hold the output on the terminal screen
-        // cout << "\nPress Enter to return to the Reports and Analytics Menu... ";
-        // cin.ignore();
         cin.get();
     }
 
@@ -1253,8 +1113,6 @@ int main()
         }
 
         cout << "\nPress any key to go back to the Main Menu...!! ";
-        // return 0;
-        // getch();
     }
 
     return 0;
