@@ -650,26 +650,44 @@ public:
             return;
         }
 
+        string customerName;
+        cout << " Enter Customer Name: ";
+        cin.ignore();
+        getline(cin, customerName);
+
         // Open the CSV file
         ofstream file("sales_bills.csv", ios::app);
         if (file.is_open())
         {
             if (file.tellp() == 0) 
             {
-                file << "Item Name,Quantity,Price,Total Price\n";
+                file << "Customer Name,Item Name,Quantity,Price,Total Price\n";
             }
+
+            // for (int a = 0; a < billItemCount; a++)
+            // {
+            //     file << customerName << "," << billItems[a].Name << "," << billItems[a].Quantity << "," << billItems[a].Price << "," << billItems[a].TotalPrice << "\n";
+            // }
 
             for (int a = 0; a < billItemCount; a++)
             {
-                file << billItems[a].Name << "," << billItems[a].Quantity << "," << billItems[a].Price << "," << billItems[a].TotalPrice << "\n";
+                if (a == 0)
+                    file << customerName << "," << billItems[a].Name << "," << billItems[a].Quantity << "," << billItems[a].Price << "," << billItems[a].TotalPrice << "\n";
+                else
+                    file << "," << billItems[a].Name << "," << billItems[a].Quantity << "," << billItems[a].Price << "," << billItems[a].TotalPrice << "\n";
             }
-
-            file << "Total Amount,,," << totalAmount << "\n";
-            file << ",,,," << "\n";
+ 
+            // file << customerName <<",Total Amount,,," << totalAmount << "\n";
+            file << "," << "Total Amount" << ",,," << totalAmount << "\n";
+            file << ",,,,," << "\n";
 
             file.close();
 
             cout << "\n Bill saved successfully to 'sales_bills.csv'!" << endl;
+            cout << " Customer Name: " << customerName << endl;
+
+            billItemCount = 0;
+            totalAmount = 0.0;
         }
         else
         {
