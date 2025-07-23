@@ -686,8 +686,8 @@ public:
             cout << "\n Bill saved successfully to 'sales_bills.csv'!" << endl;
             cout << " Customer Name: " << customerName << endl;
 
-            billItemCount = 0;
-            totalAmount = 0.0;
+            // billItemCount = 0;
+            // totalAmount = 0.0;
         }
         else
         {
@@ -957,6 +957,11 @@ public:
 
         file << "Summary Report\n";
 
+
+        int threshold;
+        cout << " Enter the low-stock threshold: ";
+        cin >> threshold;
+
         // View Low-Stock Medicines
         file << "\nLow-Stock Medicines:\n";
         file << "Name,Quantity\n";
@@ -965,10 +970,6 @@ public:
         cout << "-----------------------------------\n";
 
         Load_Data();
-
-        int threshold;
-        cout << " Enter the low-stock threshold: ";
-        cin >> threshold;
 
         bool lowStockFound = false;
 
@@ -988,16 +989,18 @@ public:
             file << "No low-stock medicines found.\n";
         }
 
+        cout<<"\n";
+
+        int currentYear, currentMonth, currentDay;
+        cout << " Enter today's date (Year Month Day): ";
+        cin >> currentYear >> currentMonth >> currentDay;
+
         // View Expired Medicines
         file << "\nExpired Medicines:\n";
         file << "Name,Expiry Date\n";
         cout << "\nExpired Medicines:\n";
         cout << " Name\t\tExpiry Date\n";
         cout << "-----------------------------------\n";
-
-        int currentYear, currentMonth, currentDay;
-        cout << " Enter today's date (Year Month Day): ";
-        cin >> currentYear >> currentMonth >> currentDay;
 
         bool expiredFound = false;
 
@@ -1018,6 +1021,8 @@ public:
             cout << "\n No expired medicines found.\n";
             file << "No expired medicines found.\n";
         }
+
+        cout<<"\n";
 
         // View Total Sales and Revenue
         file << "Total Revenue\n";

@@ -730,6 +730,12 @@ public:
             return;
         }
 
+        string customerName;
+        cout << " Enter Customer Name: ";
+        cin.ignore();
+        getline(cin, customerName);
+
+
         // Open the CSV file in append mode
         ofstream file("sales_bills.csv", ios::app);
         if (file.is_open())
@@ -737,22 +743,41 @@ public:
             // Write the header if the file is empty
             if (file.tellp() == 0) 
             {
-                file << "Item Name,Quantity,Price,Total Price\n";
+                file << "Customer Name,Item Name,Quantity,Price,Total Price\n";
             }
 
             // Write the bill items
             for (int a = 0; a < billItemCount; a++)
             {
-                file << billItems[a].Name << "," << billItems[a].Quantity << "," << billItems[a].Price << "," << billItems[a].TotalPrice << "\n";
-            }
+            //     file << billItems[a].Name << "," << billItems[a].Quantity << "," << billItems[a].Price << "," << billItems[a].TotalPrice << "\n";
+            // }
 
-            // Write the total amount
-            file << "Total Amount,,," << totalAmount << "\n";
-            file << ",,,," << "\n";
+            // // Write the total amount
+            // file << "Total Amount,,," << totalAmount << "\n";
+            // file << ",,,," << "\n";
+
+            // file.close();
+
+            // cout << "\n Bill saved successfully to 'sales_bills.csv'!" << endl;
+
+
+            if (a == 0)
+                    file << customerName << "," << billItems[a].Name << "," << billItems[a].Quantity << "," << billItems[a].Price << "," << billItems[a].TotalPrice << "\n";
+                else
+                    file << "," << billItems[a].Name << "," << billItems[a].Quantity << "," << billItems[a].Price << "," << billItems[a].TotalPrice << "\n";
+            }
+ 
+            // file << customerName <<",Total Amount,,," << totalAmount << "\n";
+            file << "," << "Total Amount" << ",,," << totalAmount << "\n";
+            file << ",,,,," << "\n";
 
             file.close();
 
             cout << "\n Bill saved successfully to 'sales_bills.csv'!" << endl;
+            cout << " Customer Name: " << customerName << endl;
+
+            billItemCount = 0;
+            totalAmount = 0.0;
         }
         else
         {
@@ -1069,6 +1094,10 @@ public:
         file << "Summary Report\n";
         // file << "=============================================================\n";
 
+        int threshold;
+        cout << " Enter the low-stock threshold: ";
+        cin >> threshold;
+
         // View Low-Stock Medicines
         file << "\nLow-Stock Medicines:\n";
         file << "Name,Quantity\n";
@@ -1078,10 +1107,6 @@ public:
 
         Load_Data(); // Load inventory data
         // int threshold = 5; // Example threshold for low stock
-
-        int threshold;
-        cout << " Enter the low-stock threshold: ";
-        cin >> threshold;
 
         bool lowStockFound = false;
 
@@ -1101,6 +1126,13 @@ public:
             file << "No low-stock medicines found.\n";
         }
 
+        cout<<"\n";
+
+
+        int currentYear, currentMonth, currentDay;
+        cout << " Enter today's date (Year Month Day): ";
+        cin >> currentYear >> currentMonth >> currentDay;
+
         // View Expired Medicines
         file << "\nExpired Medicines:\n";
         file << "Name,Expiry Date\n";
@@ -1109,10 +1141,6 @@ public:
         cout << "-----------------------------------\n";
 
         // int currentYear = 2025, currentMonth = 4, currentDay = 16; // Example current date
-
-        int currentYear, currentMonth, currentDay;
-        cout << " Enter today's date (Year Month Day): ";
-        cin >> currentYear >> currentMonth >> currentDay;
 
         bool expiredFound = false;
 
@@ -1133,6 +1161,8 @@ public:
             cout << "\n No expired medicines found.\n";
             file << "No expired medicines found.\n";
         }
+
+        cout<<"\n";
 
         // View Total Sales and Revenue
         // file << "\nTotal Sales and Revenue:\n";
