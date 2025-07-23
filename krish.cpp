@@ -1025,12 +1025,13 @@ public:
         while (getline(file, line))
         {
             stringstream ss(line);
-            string token;
+            // string token;
+            string firstCol, secondCol, thirdCol, fourthCol, totalCol;
 
-            // getline(ss, token, ','); // Item Name
-            // getline(ss, token, ','); // Quantity
-            // getline(ss, token, ','); // Price
-            // getline(ss, token, ','); // Total Price
+            // getline(ss, token, ','); 
+            // getline(ss, token, ','); 
+            // getline(ss, token, ','); 
+            // getline(ss, token, ','); 
 
             // if (token == "Total Amount")
             // {
@@ -1040,14 +1041,28 @@ public:
 
 
             // Check if the line starts with "Total Amount"
-            getline(ss, token, ',');
-            if (token == "Total Amount")
+            // getline(ss, token, ',');
+            // if (token == "Total Amount")
+            // {
+            //     // Skip the next two columns and extract the total amount
+            //     getline(ss, token, ',');
+            //     getline(ss, token, ',');
+            //     getline(ss, token, ','); 
+            //     totalRevenue += stof(token);
+            // }
+
+
+
+            getline(ss, firstCol, ',');   
+            getline(ss, secondCol, ',');  
+            getline(ss, thirdCol, ',');   
+            getline(ss, fourthCol, ',');  
+            getline(ss, totalCol, ',');    
+
+            if (secondCol == "Total Amount")
             {
-                // Skip the next two columns and extract the total amount
-                getline(ss, token, ','); // Skip empty column
-                getline(ss, token, ','); // Skip empty column
-                getline(ss, token, ','); // Extract the total amount
-                totalRevenue += stof(token);
+                if (!totalCol.empty())
+                    totalRevenue += stof(totalCol);
             }
         }
 
@@ -1082,7 +1097,6 @@ public:
         cout << "||\t      Summary Report                                ||" << endl;
         cout << "=============================================================" << endl;
 
-        // Open the CSV file to save the summary report
         ofstream file("summary_report.csv");
         if (!file.is_open())
         {
@@ -1090,7 +1104,6 @@ public:
             return;
         }
 
-        // Write the header to the CSV file
         file << "Summary Report\n";
         // file << "=============================================================\n";
 
@@ -1166,11 +1179,12 @@ public:
 
         // View Total Sales and Revenue
         // file << "\nTotal Sales and Revenue:\n";
-        file << "Total Revenue\n";
-        cout << "\nTotal Sales and Revenue:\n";
+        // file << "Total Revenue\n";
+        // cout << "\nTotal Sales:\n";
 
         ifstream salesFile("sales_bills.csv");
         float totalRevenue = 0.0;
+        int totalSales = 0;
 
         if (salesFile.is_open())
         {
@@ -1178,23 +1192,45 @@ public:
             while (getline(salesFile, line))
             {
                 stringstream ss(line);
-                string token;
+                // string token;
+                string firstCol, secondCol, thirdCol, fourthCol, totalCol;
 
-                getline(ss, token, ',');
-                if (token == "Total Amount")
+
+                // getline(ss, token, ',');
+                // if (token == "Total Amount")
+                // {
+                //     getline(ss, token, ',');
+                //     getline(ss, token, ',');
+                //     getline(ss, token, ',');
+                //     totalRevenue += stof(token);
+                // }
+
+
+                getline(ss, firstCol, ',');    
+                getline(ss, secondCol, ',');   
+                getline(ss, thirdCol, ',');   
+                getline(ss, fourthCol, ',');  
+                getline(ss, totalCol, ',');   
+
+                if (secondCol == "Total Amount")
                 {
-                    getline(ss, token, ','); // Skip empty column
-                    getline(ss, token, ','); // Skip empty column
-                    getline(ss, token, ','); // Extract the total amount
-                    totalRevenue += stof(token);
+                    totalSales++;
+                    if (!totalCol.empty())
+                        totalRevenue += stof(totalCol);
                 }
             }
             salesFile.close();
         }
 
+        // cout << "Total Revenue: " << totalRevenue << endl;
+        // // file << totalRevenue << "\n";
+        // file << totalRevenue <<endl;
+
+        cout << "Total Sales: " << totalSales << endl;
         cout << "Total Revenue: " << totalRevenue << endl;
-        // file << totalRevenue << "\n";
-        file << totalRevenue;
+        file << "Total Sales," << totalSales << endl;
+        file << "Total Revenue," << totalRevenue << endl;
+
 
         // Close the CSV file
         file.close();
@@ -1202,7 +1238,6 @@ public:
         cout << "\n Summary Report Generated Successfully!" << endl;
         cout << "_____________________________________________________________" << endl;
 
-        // Pause to hold the output on the terminal screen
         // cout << "\nPress Enter to return to the Reports and Analytics Menu... ";
         // cin.ignore();
         cin.get();
