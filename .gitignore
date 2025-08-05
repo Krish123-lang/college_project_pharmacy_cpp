@@ -35,3 +35,6 @@
 *.app
 *.csv
 .fuse_hidden*
+*.pdf
+*.docx
+*.pptx

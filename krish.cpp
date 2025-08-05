@@ -1,10 +1,27 @@
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <chrono>
+#include <ctime>
+#include <limits>
 using namespace std;
 
 int i = 0;
+
+// Helper function to check if a date is in the future compared to today
+bool isFutureDate(int year, int month, int day) {
+    time_t t = time(0);
+    tm *now = localtime(&t);
+    int currYear = now->tm_year + 1900;
+    int currMonth = now->tm_mon + 1;
+    int currDay = now->tm_mday;
+    if (year > currYear) return true;
+    if (year == currYear && month > currMonth) return true;
+    if (year == currYear && month == currMonth && day > currDay) return true;
+    return false;
+}
 
 struct Medicine
 {
@@ -119,69 +136,6 @@ class Inventory
 {
 public:
     int Option2;
-
-    // void Insert_Medicine()
-    // {
-    //     clearConsole();
-
-    //     cout << "\n=============================================================" << endl;
-    //     cout << "||\t\t     Insert Medicine                       ||" << endl;
-    //     cout << "=============================================================" << endl;
-
-    //     cout << " Enter Medicine Name = ";
-    //     cin >> s[i].Name;
-        
-    //     cout << " Enter Quantity = ";
-    //     cin >> s[i].Quantity;
-
-    //     cout << " Enter Price = ";
-    //     cin >> s[i].Price;
-
-    //     cout << " Enter Expiry Date ( Year/Month/Day )" << endl;
-    //     cout << " Enter Year  = ";
-    //     cin >> s[i].Year;
-    //     cout << " Enter Month = ";
-    //     cin >> s[i].Month;
-    //     cout << " Enter Day   = ";
-    //     cin >> s[i].Day;
-
-    //     // Check if the file exists
-    //     ifstream checkFile("medicine_data.csv");
-    //     bool fileExists = checkFile.good();
-    //     checkFile.close();
-
-    //     // Write the data to a CSV file
-    //     ofstream file("medicine_data.csv", ios::app); // Open in append mode
-    //     if (file.is_open())
-    //     {
-    //         // Add column headers if the file is being created for the first time
-    //         if (!fileExists)
-    //         {
-    //             file << "Name,Quantity,Price,Expiry Date\n";
-    //         }
-
-    //         // Write the medicine data
-    //         file << s[i].Name << "," << s[i].Quantity << "," << s[i].Price << ","
-    //             << s[i].Year << "/" << s[i].Month << "/" << s[i].Day << "\n";
-    //         file.close();
-    //     }
-    //     else
-    //     {
-    //         cout << "Error: Unable to open file for writing.\n";
-    //     }
-
-    //     // cin.ignore(); // Clear the input buffer
-
-    //     cout << "_____________________________________________________________" << endl;
-    //     cout << "\n\t\t Inserted Successfully...!!" << endl;
-    //     cout << "_____________________________________________________________" << endl;
-    //     i++;
-
-    //     cout << "\nPress Enter to return to the Main Menu... ";
-    //     cin.ignore();
-    //     cin.get();
-    // }
-
     void Insert_Medicine()
     {
         clearConsole();
@@ -212,6 +166,15 @@ public:
         cin >> month;
         cout << " Enter Day   = ";
         cin >> day;
+
+        // Check expiry date is in the future
+        if (!isFutureDate(year, month, day)) {
+            cout << "\n Error: Expiry date must be a future date. Cannot insert expired medicine!\n";
+            cout << "\nPress Enter to return to the Main Menu... ";
+            cin.ignore();
+            cin.get();
+            return;
+        }
 
         // Check if the medicine already exists
         bool found = false;
@@ -303,11 +266,23 @@ public:
 
                 cout << " Enter New Expiry Date ( Year/Month/Day )" << endl;
                 cout << " Enter New Year  = ";
-                cin >> s[a].Year;
+                int newYear, newMonth, newDay;
+                cin >> newYear;
                 cout << " Enter New Month = ";
-                cin >> s[a].Month;
+                cin >> newMonth;
                 cout << " Enter New Day   = ";
-                cin >> s[a].Day;
+                cin >> newDay;
+                // Check expiry date is in the future
+                if (!isFutureDate(newYear, newMonth, newDay)) {
+                    cout << "\n Error: Expiry date must be a future date. Cannot update to expired medicine!\n";
+                    cout << "\nPress Enter to return to the Main Menu... ";
+                    cin.ignore();
+                    cin.get();
+                    return;
+                }
+                s[a].Year = newYear;
+                s[a].Month = newMonth;
+                s[a].Day = newDay;
 
                 Found = true;
                 break;
@@ -550,20 +525,22 @@ public:
     }
 };
 
+
 class Sales_Billing
 {
 private:
     struct BillItem
     {
-        string Name, CustomerName;
+        string Name;
         int Quantity;
         float Price;
         float TotalPrice;
     };
 
-    BillItem billItems[100]; 
+    BillItem billItems[100];
     int billItemCount = 0;
     float totalAmount = 0.0;
+    string customerName; 
 
 public:
     void Add_Item()
@@ -574,7 +551,7 @@ public:
         cout << "||\t\t     Add Item to Bill                      ||" << endl;
         cout << "=============================================================" << endl;
 
-        Load_Data(); 
+        Load_Data();
 
         if (i == 0)
         {
@@ -587,29 +564,44 @@ public:
             return;
         }
 
+        // Prompt for customer name only if this is the first item in the bill
+        if (billItemCount == 0)
+        {
+            cout << " Enter Customer Name: ";
+            // cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            getline(cin, customerName);
+            if (customerName.empty()) customerName = "Unknown";
+        }
+
         string itemName;
         int quantity;
         bool found = false;
 
         cout << " Enter Item Name = ";
-        cin.ignore();
         getline(cin, itemName);
 
         for (int a = 0; a < i; a++)
         {
             if (s[a].Name == itemName)
             {
+                // Check if the medicine is expired
+                if (!isFutureDate(s[a].Year, s[a].Month, s[a].Day)) {
+                    cout << "\n Error: Cannot add expired medicine to the bill!\n";
+                    cout << "\nPress Enter to return... ";
+                    cin.get();
+                    return;
+                }
                 found = true;
 
                 cout << " Enter Quantity = ";
                 cin >> quantity;
+                cin.ignore();
 
                 if (quantity > s[a].Quantity)
                 {
                     cout << "\n Not enough stock available. Available Quantity = " << s[a].Quantity << endl;
-                    cin.ignore();
+                    cout << "\nPress Enter to return... ";
                     cin.get();
-
                     return;
                 }
 
@@ -634,7 +626,8 @@ public:
                     }
                 }
 
-                if (!billFound){
+                if (!billFound)
+                {
                     // Add item to the bill
                     billItems[billItemCount].Name = s[a].Name;
                     billItems[billItemCount].Quantity = quantity;
@@ -646,25 +639,24 @@ public:
                     s[a].Quantity -= quantity;
 
                     // Update total amount
-                    totalAmount += billItems[billItemCount - 1].TotalPrice;
-
-                    cout << "\n Item added to the bill successfully!" << endl;
-                    cin.get();
-                    break;
+                    totalAmount += quantity * s[a].Price;
                 }
+
+                cout << "\n Item added to the bill successfully!" << endl;
+                cout << "\nPress Enter to return... ";
+                cin.get();
+                break;
             }
         }
 
         if (!found)
         {
             cout << "\n Item not found in inventory!" << endl;
+            cout << "\nPress Enter to return... ";
+            cin.get();
         }
 
-        Save_Data(); 
-
-        cout << "\nPress Enter to return to the Sales and Billing Menu... ";
-        // cin.ignore();
-        cin.get();
+        Save_Data();
     }
 
     void Display_Bill()
@@ -681,33 +673,38 @@ public:
             cout << "_____________________________________________________________" << endl;
 
             cout << "\nPress Enter to return to the Sales and Billing Menu... ";
-            cin.ignore();
             cin.get();
             return;
         }
 
-        // cout << " Item Name\tQuantity\tPrice\tTotal Price" << endl;
-        // cout << "-------------------------------------------------------------" << endl;
+        // Get current time as system time
+        auto now = std::chrono::system_clock::now();
+        std::time_t now_time_t = std::chrono::system_clock::to_time_t(now);
+        std::tm* local_tm = std::localtime(&now_time_t);
 
-        // for (int a = 0; a < billItemCount; a++)
-        // {
-        //     cout << " " << billItems[a].Name << "\t\t" << billItems[a].Quantity << "\t\t" << billItems[a].Price << "\t" << billItems[a].TotalPrice << endl;
-        // }
+        cout << "\n\n=============================================================" << endl;
+        cout << "||\t\t !!...Purbanchal Pharmacy...!!              ||" << endl;
+        cout << "||\t\t  Biratnager, MORANG                        ||" << endl;
+        cout << "=============================================================" << endl;
+
+        cout << " CUSTOMER NAME  : " << customerName << "                    PayType : CASH" << endl;
+        cout << " DATE           : " << std::put_time(local_tm, "%Y-%m-%d") << " " << std::put_time(local_tm, "%A") << endl;
+        cout << " TIME           : " << std::put_time(local_tm, "%H:%M:%S") << endl;
+        cout << "-------------------------------------------------------------" << endl;
+        cout << left << setw(20) << "Name" << setw(12) << "Quantity" << setw(12) << "Price" << setw(15) << "Total Price" << endl;
+        cout << "-------------------------------------------------------------" << endl;
 
         for (int a = 0; a < billItemCount; a++)
         {
-            cout<< " Item Name: " << billItems[a].Name <<endl;
-            cout<< " Quantity: " << billItems[a].Quantity <<endl;
-            cout<< " Price: " << billItems[a].Price <<endl;
-            cout<< " Total Price: " << billItems[a].TotalPrice << endl;
-            cout << "-------------------------------------------------------------" << endl;
+            cout << left << setw(20) << billItems[a].Name
+                 << setw(12) << billItems[a].Quantity
+                 << setw(12) << fixed << setprecision(2) << billItems[a].Price
+                 << setw(15) << fixed << setprecision(2) << billItems[a].TotalPrice << endl;
         }
-
-        // cout << "-------------------------------------------------------------" << endl;
-        cout << " Total Amount: " << totalAmount << endl;
+        cout << "-------------------------------------------------------------" << endl;
+        cout << right << setw(50) << "Total Amount: " << fixed << setprecision(2) << totalAmount << endl;
 
         cout << "\nPress Enter to return to the Sales and Billing Menu... ";
-        cin.ignore();
         cin.get();
     }
 
@@ -725,23 +722,16 @@ public:
             cout << "_____________________________________________________________" << endl;
 
             cout << "\nPress Enter to return to the Sales and Billing Menu... ";
-            cin.ignore();
             cin.get();
             return;
         }
-
-        string customerName;
-        cout << " Enter Customer Name: ";
-        cin.ignore();
-        getline(cin, customerName);
-
 
         // Open the CSV file in append mode
         ofstream file("sales_bills.csv", ios::app);
         if (file.is_open())
         {
             // Write the header if the file is empty
-            if (file.tellp() == 0) 
+            if (file.tellp() == 0)
             {
                 file << "Customer Name,Item Name,Quantity,Price,Total Price\n";
             }
@@ -749,25 +739,12 @@ public:
             // Write the bill items
             for (int a = 0; a < billItemCount; a++)
             {
-            //     file << billItems[a].Name << "," << billItems[a].Quantity << "," << billItems[a].Price << "," << billItems[a].TotalPrice << "\n";
-            // }
-
-            // // Write the total amount
-            // file << "Total Amount,,," << totalAmount << "\n";
-            // file << ",,,," << "\n";
-
-            // file.close();
-
-            // cout << "\n Bill saved successfully to 'sales_bills.csv'!" << endl;
-
-
-            if (a == 0)
+                if (a == 0)
                     file << customerName << "," << billItems[a].Name << "," << billItems[a].Quantity << "," << billItems[a].Price << "," << billItems[a].TotalPrice << "\n";
                 else
                     file << "," << billItems[a].Name << "," << billItems[a].Quantity << "," << billItems[a].Price << "," << billItems[a].TotalPrice << "\n";
             }
- 
-            // file << customerName <<",Total Amount,,," << totalAmount << "\n";
+
             file << "," << "Total Amount" << ",,," << totalAmount << "\n";
             file << ",,,,," << "\n";
 
@@ -776,8 +753,10 @@ public:
             cout << "\n Bill saved successfully to 'sales_bills.csv'!" << endl;
             cout << " Customer Name: " << customerName << endl;
 
+            // Reset bill for next customer
             billItemCount = 0;
             totalAmount = 0.0;
+            customerName.clear();
         }
         else
         {
@@ -785,7 +764,6 @@ public:
         }
 
         cout << "\nPress Enter to return to the Sales and Billing Menu... ";
-        cin.ignore();
         cin.get();
     }
 
@@ -807,6 +785,7 @@ public:
             cout << "_____________________________________________________________" << endl;
             cout << " Enter your Option = ";
             cin >> option;
+            cin.ignore();
 
             switch (option)
             {
@@ -823,27 +802,18 @@ public:
                 return;
             default:
                 cout << "\n Invalid Option...!!" << endl;
+                cout << "\nPress Enter to continue... ";
+                cin.get();
                 break;
             }
         }
     }
 };
 
+
 class Reports_Analysis
 {
 public:
-    // void Reports_Analysis_Print()
-    // {
-    //     cout << "\n=============================================================" << endl;
-    //     cout << "||\t      REPORT AND ANALYSIS MANAGEMENT               ||" << endl;
-    //     cout << "=============================================================" << endl;
-
-    //     cout << "\nPress Enter to return to the Main Menu... ";
-    //     cin.ignore();
-    //     cin.get();
-    // }
-
-    // =======================================================
 
     void Reports_Analysis_Menu()
     {
@@ -1025,33 +995,7 @@ public:
         while (getline(file, line))
         {
             stringstream ss(line);
-            // string token;
             string firstCol, secondCol, thirdCol, fourthCol, totalCol;
-
-            // getline(ss, token, ','); 
-            // getline(ss, token, ','); 
-            // getline(ss, token, ','); 
-            // getline(ss, token, ','); 
-
-            // if (token == "Total Amount")
-            // {
-            //     getline(ss, token, ',');
-            //     totalRevenue += stof(token);
-            // }
-
-
-            // Check if the line starts with "Total Amount"
-            // getline(ss, token, ',');
-            // if (token == "Total Amount")
-            // {
-            //     // Skip the next two columns and extract the total amount
-            //     getline(ss, token, ',');
-            //     getline(ss, token, ',');
-            //     getline(ss, token, ','); 
-            //     totalRevenue += stof(token);
-            // }
-
-
 
             getline(ss, firstCol, ',');   
             getline(ss, secondCol, ',');  
@@ -1072,23 +1016,6 @@ public:
         cout << "_____________________________________________________________" << endl;
     }
 
-    // void Generate_Summary_Report()
-    // {
-    //     clearConsole();
-
-    //     cout << "\n=============================================================" << endl;
-    //     cout << "||\t      Summary Report                                ||" << endl;
-    //     cout << "=============================================================" << endl;
-
-    //     View_Low_Stock();
-    //     View_Expired_Medicines();
-    //     View_Total_Sales();
-
-    //     cout << "\n Summary Report Generated Successfully!" << endl;
-    //     cout << "_____________________________________________________________" << endl;
-    // }
-
-
     void Generate_Summary_Report()
     {
         clearConsole();
@@ -1105,7 +1032,6 @@ public:
         }
 
         file << "Summary Report\n";
-        // file << "=============================================================\n";
 
         int threshold;
         cout << " Enter the low-stock threshold: ";
@@ -1119,7 +1045,6 @@ public:
         cout << "-----------------------------------\n";
 
         Load_Data(); // Load inventory data
-        // int threshold = 5; // Example threshold for low stock
 
         bool lowStockFound = false;
 
@@ -1153,8 +1078,6 @@ public:
         cout << " Name\t\tExpiry Date\n";
         cout << "-----------------------------------\n";
 
-        // int currentYear = 2025, currentMonth = 4, currentDay = 16; // Example current date
-
         bool expiredFound = false;
 
         for (int a = 0; a < i; a++)
@@ -1177,11 +1100,6 @@ public:
 
         cout<<"\n";
 
-        // View Total Sales and Revenue
-        // file << "\nTotal Sales and Revenue:\n";
-        // file << "Total Revenue\n";
-        // cout << "\nTotal Sales:\n";
-
         ifstream salesFile("sales_bills.csv");
         float totalRevenue = 0.0;
         int totalSales = 0;
@@ -1194,17 +1112,6 @@ public:
                 stringstream ss(line);
                 // string token;
                 string firstCol, secondCol, thirdCol, fourthCol, totalCol;
-
-
-                // getline(ss, token, ',');
-                // if (token == "Total Amount")
-                // {
-                //     getline(ss, token, ',');
-                //     getline(ss, token, ',');
-                //     getline(ss, token, ',');
-                //     totalRevenue += stof(token);
-                // }
-
 
                 getline(ss, firstCol, ',');    
                 getline(ss, secondCol, ',');   
@@ -1222,10 +1129,6 @@ public:
             salesFile.close();
         }
 
-        // cout << "Total Revenue: " << totalRevenue << endl;
-        // // file << totalRevenue << "\n";
-        // file << totalRevenue <<endl;
-
         cout << "Total Sales: " << totalSales << endl;
         cout << "Total Revenue: " << totalRevenue << endl;
         file << "Total Sales," << totalSales << endl;
@@ -1238,8 +1141,6 @@ public:
         cout << "\n Summary Report Generated Successfully!" << endl;
         cout << "_____________________________________________________________" << endl;
 
-        // cout << "\nPress Enter to return to the Reports and Analytics Menu... ";
-        // cin.ignore();
         cin.get();
     }
 
@@ -1318,8 +1219,6 @@ int main()
         }
 
         cout << "\nPress any key to go back to the Main Menu...!! ";
-        // return 0;
-        // getch();
     }
 
     return 0;
